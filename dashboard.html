@@ -1,34 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="dashboard.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizMaster — Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <div class="dashboard">
-    <h2>Welcome, <span id="user"></span></h2>
-    <p><strong>Your Last Score:</strong> <span id="score">Not Attempted</span></p>
-    <button onclick="startQuiz()">Start Quiz</button>
-    <button onclick="logout()">Logout</button>
-  </div>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="dashboard.html" class="navbar-brand">
+        <div class="navbar-logo">🎯</div>
+        <span class="navbar-title">QuizMaster</span>
+      </a>
+      <div class="navbar-right">
+        <div class="navbar-user">
+          <div class="avatar" id="nav-avatar">U</div>
+          <span id="nav-username">Username</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
 
+  <main class="container py-6">
+    <div class="page-header slide-up">
+      <h1 class="page-title">Welcome back, <span id="welcome-name">Learner</span>! 👋</h1>
+      <p class="page-subtitle">Ready to challenge yourself today? Choose a subject and test your knowledge.</p>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="stats-grid slide-up" style="animation-delay: 0.1s">
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">Total Attempts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-value" id="stat-best">--</div>
+        <div class="stat-label">Best Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-value" id="stat-avg">--</div>
+        <div class="stat-label">Average Score</div>
+      </div>
+    </div>
+
+    <!-- Row 1: CTA + Leaderboard -->
+    <div class="grid-2 slide-up" style="animation-delay: 0.2s">
+      <!-- CTA Card -->
+      <div class="card card-elevated" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <h2 class="section-title mb-4">Start a New Challenge</h2>
+          <p class="text-secondary mb-6">Choose from Python, AI, Web Development, DSA, DBMS, or Networks. Select a difficulty level and race against the clock!</p>
+        </div>
+        <a href="subjects.html" class="btn btn-primary btn-lg text-center" style="width: fit-content; align-self: flex-start;">
+          Choose Subject &amp; Start Quiz 🚀
+        </a>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="card">
+        <h2 class="section-title mb-4">Global Leaderboard 🏆</h2>
+        <div id="leaderboard-list" class="flex flex-col gap-3">
+          <!-- Populated by dashboard.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Subject Mastery (full width) -->
+    <div class="card mt-8 slide-up" style="animation-delay: 0.3s">
+      <h2 class="section-title mb-4">Subject Mastery (Best Score)</h2>
+      <div id="subject-performance" class="flex flex-col gap-4">
+        <!-- Populated by dashboard.js -->
+      </div>
+    </div>
+
+    <!-- Row 3: Recent Attempts (full width) -->
+    <div class="card mt-8 slide-up" style="animation-delay: 0.35s; overflow-x: auto;">
+      <h2 class="section-title mb-4">Recent Quiz Attempts</h2>
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Difficulty</th>
+            <th>Score</th>
+            <th>Accuracy</th>
+            <th>Time Taken</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="history-tbody">
+          <!-- Populated by dashboard.js -->
+        </tbody>
+      </table>
+      <div id="history-empty" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">📝</div>
+        <p class="empty-state-text">No quizzes taken yet. Your attempt history will appear here.</p>
+      </div>
+    </div>
+
+    <!-- Row 4: Charts and Data Management -->
+    <div class="grid-2 mt-8 slide-up" style="animation-delay: 0.4s">
+      <!-- Performance Chart -->
+      <div class="card">
+        <h2 class="section-title mb-4">Performance Trend</h2>
+        <div style="position: relative; height: 260px;">
+          <canvas id="performance-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Data Management -->
+      <div class="card">
+        <h2 class="section-title mb-4">Data Management</h2>
+        <p class="text-secondary mb-4">Backup your quiz history or import data from another session.</p>
+        <div class="flex flex-col gap-3">
+          <button class="btn btn-secondary btn-full" onclick="exportData()">💾 Export Data (Backup)</button>
+          
+          <label class="btn btn-ghost btn-full" style="cursor: pointer; text-align: center;">
+            📂 Import Data
+            <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importData(event)">
+          </label>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const username = localStorage.getItem('username');
-    document.getElementById('user').innerText = username || "Guest";
-
-    const result = localStorage.getItem(`result_${username}`);
-    if (result) {
-      document.getElementById('score').innerText = result;
+    // Register a global plugin to prevent Chart.js from painting a white canvas background
+    if (typeof Chart !== 'undefined') {
+      Chart.register({
+        id: 'noBackground',
+        beforeDraw(chart) {
+          chart.ctx.clearRect(0, 0, chart.width, chart.height);
+        }
+      });
     }
-
-    function startQuiz() {
-      window.location.href = 'subjects.html';
-    }
-
-    function logout() {
-      localStorage.removeItem('username');
-      window.location.href = 'login.html';
-    }
+  </script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', initDashboard);
   </script>
 </body>
 </html>

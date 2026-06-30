@@ -1,20 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Select Level</title>
-  <link rel="stylesheet" href="levels.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizMaster — Select Difficulty</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <h2>Select Difficulty Level</h2>
-  <div class="levels">
-    <button onclick="selectLevel('Easy')">Easy</button>
-    <button onclick="selectLevel('Medium')">Medium</button>
-    <button onclick="selectLevel('Hard')">Hard</button>
-  </div>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="dashboard.html" class="navbar-brand">
+        <div class="navbar-logo">🎯</div>
+        <span class="navbar-title">QuizMaster</span>
+      </a>
+      <div class="navbar-right">
+        <div class="navbar-user">
+          <div class="avatar" id="nav-avatar">U</div>
+          <span id="nav-username">Username</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
 
+  <main class="container py-6">
+    <div class="page-header slide-up">
+      <a href="subjects.html" class="btn btn-ghost btn-sm mb-4">← Back to Subjects</a>
+      <h1 class="page-title">Select Difficulty Level</h1>
+      <p class="page-subtitle">Choosing a higher difficulty level decreases the time limit and tests deeper concepts.</p>
+    </div>
+
+    <!-- Active Subject indicator -->
+    <div class="card mb-6 slide-up" style="animation-delay: 0.1s; padding: 16px 24px; display: inline-flex; align-items: center; gap: 12px;">
+      <span class="text-secondary" style="font-size: 14px; font-weight: 500;">SELECTED SUBJECT:</span>
+      <span class="badge badge-purple" id="selected-subject-badge" style="font-size: 14px; padding: 6px 14px;">Subject</span>
+    </div>
+
+    <div class="levels-grid slide-up" style="animation-delay: 0.15s">
+      <!-- Easy Level -->
+      <button class="level-card easy" onclick="selectLevel('Easy')">
+        <span class="level-icon">🟢</span>
+        <h2 class="level-name text-center">Easy</h2>
+        <p class="level-desc text-center">Perfect for beginners. Simple syntax, definitions, basic features, and elementary concepts.</p>
+        <div class="level-meta">
+          <span class="badge badge-green">⏱ 10 Mins (600s)</span>
+          <span class="badge badge-purple">10 Questions</span>
+        </div>
+      </button>
+
+      <!-- Medium Level -->
+      <button class="level-card medium" onclick="selectLevel('Medium')">
+        <span class="level-icon">🟡</span>
+        <h2 class="level-name text-center">Medium</h2>
+        <p class="level-desc text-center">For intermediate learners. Tests application, standard design patterns, analysis, and intermediate details.</p>
+        <div class="level-meta">
+          <span class="badge badge-yellow">⏱ 8 Mins (480s)</span>
+          <span class="badge badge-purple">10 Questions</span>
+        </div>
+      </button>
+
+      <!-- Hard Level -->
+      <button class="level-card hard" onclick="selectLevel('Hard')">
+        <span class="level-icon">🔴</span>
+        <h2 class="level-name text-center">Hard</h2>
+        <p class="level-desc text-center">For advanced developers. Highly technical implementation, complexity analysis, internals, and edge cases.</p>
+        <div class="level-meta">
+          <span class="badge badge-red">⏱ 6 Mins (360s)</span>
+          <span class="badge badge-purple">10 Questions</span>
+        </div>
+      </button>
+    </div>
+  </main>
+
+  <script src="js/auth.js"></script>
   <script>
+    const session = guardPage();
+    if (session) {
+      document.getElementById('nav-avatar').textContent = session.username[0].toUpperCase();
+      document.getElementById('nav-username').textContent = session.username;
+    }
+
+    const subject = localStorage.getItem('quizSubject');
+    if (!subject) {
+      window.location.href = 'subjects.html';
+    } else {
+      document.getElementById('selected-subject-badge').textContent = subject;
+    }
+
     function selectLevel(level) {
-      localStorage.setItem('level', level);
+      localStorage.setItem('quizLevel', level);
       window.location.href = 'quiz.html';
     }
   </script>

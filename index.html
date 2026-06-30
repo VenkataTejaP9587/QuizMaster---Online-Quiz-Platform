@@ -1,23 +1,259 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login</title>
-  <link rel="stylesheet" href="css/index.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizMaster — Sign In</title>
+  <meta name="description" content="Sign in to QuizMaster — the smart interactive quiz platform for testing and improving your knowledge." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .auth-split {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    /* ---- Left Hero Panel ---- */
+    .auth-hero {
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0f172a 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-hero::before {
+      content: '';
+      position: absolute;
+      top: -100px; left: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%);
+      animation: heroGlow 6s ease-in-out infinite alternate;
+    }
+    .auth-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; right: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 70%);
+      animation: heroGlow 8s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes heroGlow {
+      from { transform: scale(1); opacity: 0.7; }
+      to   { transform: scale(1.2); opacity: 1; }
+    }
+    .hero-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 60px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-brand-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 8px 24px rgba(124,58,237,0.5);
+    }
+    .hero-brand-name {
+      font-size: 22px; font-weight: 800;
+      background: linear-gradient(135deg, #a78bfa, #60a5fa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-headline {
+      position: relative; z-index: 1;
+      font-size: 46px; font-weight: 800;
+      line-height: 1.15;
+      color: #f1f5f9;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+    .hero-headline span {
+      background: linear-gradient(135deg, #a78bfa, #60a5fa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      position: relative; z-index: 1;
+      font-size: 16px; color: #94a3b8;
+      line-height: 1.7;
+      max-width: 380px;
+      margin-bottom: 48px;
+    }
+    .hero-features {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    .hero-feature {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .hero-feature-icon {
+      width: 40px; height: 40px;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .hero-feature-text { font-size: 14px; color: #cbd5e1; line-height: 1.5; }
+    .hero-feature-text strong { color: #f1f5f9; display: block; margin-bottom: 2px; }
+
+    /* ---- Right Form Panel ---- */
+    .auth-form-panel {
+      background: #0d0d1a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 80px;
+    }
+    .auth-form-inner { width: 100%; max-width: 380px; }
+    .auth-form-title {
+      font-size: 28px; font-weight: 800;
+      color: #f1f5f9; letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+    .auth-form-sub { font-size: 14px; color: #94a3b8; margin-bottom: 36px; }
+
+    /* floating dots decoration */
+    .hero-dots {
+      position: absolute; bottom: 40px; left: 60px;
+      display: flex; gap: 8px; z-index: 1;
+    }
+    .hero-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    @media (max-width: 900px) {
+      .auth-split { grid-template-columns: 1fr; }
+      .auth-hero { display: none; }
+      .auth-form-panel { padding: 40px 24px; }
+    }
+  </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Enter Username" required />
-    <button onclick="login()">Login</button>
+  <div class="auth-split">
+
+    <!-- Left: Hero Panel -->
+    <div class="auth-hero">
+      <div class="hero-brand">
+        <div class="hero-brand-icon">🎯</div>
+        <span class="hero-brand-name">QuizMaster</span>
+      </div>
+
+      <h1 class="hero-headline">
+        Challenge Your<br><span>Mind. Track</span><br>Your Growth.
+      </h1>
+      <p class="hero-sub">
+        Test yourself across 6 technical subjects with 180+ expert-curated questions. Race against the clock, earn certificates, and climb the leaderboard.
+      </p>
+
+      <div class="hero-features">
+        <div class="hero-feature">
+          <div class="hero-feature-icon">🧠</div>
+          <div class="hero-feature-text">
+            <strong>6 Subjects, 3 Difficulty Levels</strong>
+            Python, AI, Web Dev, DSA, DBMS & Networks
+          </div>
+        </div>
+        <div class="hero-feature">
+          <div class="hero-feature-icon">🏆</div>
+          <div class="hero-feature-text">
+            <strong>Live Leaderboard & Certificates</strong>
+            Score 80%+ to earn a downloadable PDF certificate
+          </div>
+        </div>
+        <div class="hero-feature">
+          <div class="hero-feature-icon">📊</div>
+          <div class="hero-feature-text">
+            <strong>Performance Analytics</strong>
+            Track your progress with charts and detailed reviews
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-dots">
+        <div class="hero-dot" style="background:#7c3aed"></div>
+        <div class="hero-dot" style="background:#2563eb"></div>
+        <div class="hero-dot" style="background:#06b6d4"></div>
+      </div>
+    </div>
+
+    <!-- Right: Form Panel -->
+    <div class="auth-form-panel">
+      <div class="auth-form-inner">
+        <h2 class="auth-form-title">Welcome back 👋</h2>
+        <p class="auth-form-sub">Sign in to your account to continue learning</p>
+
+        <div id="login-alert" class="alert alert-error" role="alert">
+          <span>⚠️</span>
+          <span id="login-alert-msg">Error message</span>
+        </div>
+
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label for="login-username" class="form-label">Username</label>
+            <input
+              type="text"
+              id="login-username"
+              class="form-input"
+              placeholder="Enter your username"
+              autocomplete="username"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="login-password" class="form-label">Password</label>
+            <input
+              type="password"
+              id="login-password"
+              class="form-input"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full btn-lg" id="login-btn" style="margin-top: 8px;">
+            Sign In →
+          </button>
+        </form>
+
+        <div class="auth-link" style="margin-top: 28px;">
+          Don't have an account? <a href="signup.html">Create one free →</a>
+        </div>
+      </div>
+    </div>
+
   </div>
+
+  <script src="js/auth.js"></script>
   <script>
-    function login() {
-      const username = document.getElementById('username').value;
-      if (username) {
-        localStorage.setItem('username', username);
+    if (getSession()) window.location.href = 'dashboard.html';
+
+    document.getElementById('login-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const username  = document.getElementById('login-username').value.trim();
+      const password  = document.getElementById('login-password').value;
+      const alertEl   = document.getElementById('login-alert');
+      const alertMsg  = document.getElementById('login-alert-msg');
+
+      alertEl.classList.remove('visible');
+
+      const result = login(username, password);
+      if (result.success) {
         window.location.href = 'dashboard.html';
+      } else {
+        alertMsg.textContent = result.message;
+        alertEl.classList.add('visible');
       }
-    }
+    });
   </script>
 </body>
 </html>

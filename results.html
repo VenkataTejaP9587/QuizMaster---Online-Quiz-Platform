@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizMaster — Performance Summary</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="dashboard.html" class="navbar-brand">
+        <div class="navbar-logo">🎯</div>
+        <span class="navbar-title">QuizMaster</span>
+      </a>
+      <div class="navbar-right">
+        <div class="navbar-user">
+          <div class="avatar" id="nav-avatar">U</div>
+          <span id="nav-username">Username</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container-md py-6">
+    <div class="card card-elevated results-hero slide-up">
+      <div class="flex justify-center gap-2 mb-4">
+        <span class="badge badge-purple" id="res-subject">Subject</span>
+        <span class="badge badge-blue" id="res-level">Level</span>
+      </div>
+
+      <!-- Animated Circular Progress Ring -->
+      <div class="score-ring-container">
+        <svg class="score-ring-svg">
+          <defs>
+            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7c3aed" />
+              <stop offset="100%" stop-color="#2563eb" />
+            </linearGradient>
+          </defs>
+          <circle class="score-ring-bg" cx="95" cy="95" r="80" />
+          <circle class="score-ring-fill" id="score-ring-fill" cx="95" cy="95" r="80" />
+        </svg>
+        <div class="score-ring-text">
+          <div class="score-percentage" id="res-pct">0%</div>
+          <div class="score-label" id="res-score-fraction">0/0</div>
+        </div>
+      </div>
+
+      <div class="result-badge" id="res-performance-badge">Performance</div>
+      <p class="text-secondary mt-2" id="res-message">Here is your summary message.</p>
+
+      <!-- Stat Counters -->
+      <div class="results-stats">
+        <div class="stat-card" style="padding: 14px 10px;">
+          <div class="stat-value" id="stat-correct" style="color: var(--success); font-size: 22px;">0</div>
+          <div class="stat-label" style="font-size: 11px;">Correct</div>
+        </div>
+        <div class="stat-card" style="padding: 14px 10px;">
+          <div class="stat-value" id="stat-wrong" style="color: var(--error); font-size: 22px;">0</div>
+          <div class="stat-label" style="font-size: 11px;">Incorrect</div>
+        </div>
+        <div class="stat-card" style="padding: 14px 10px;">
+          <div class="stat-value" id="stat-skipped" style="color: var(--warning); font-size: 22px;">0</div>
+          <div class="stat-label" style="font-size: 11px;">Skipped</div>
+        </div>
+        <div class="stat-card" style="padding: 14px 10px;">
+          <div class="stat-value" id="stat-time" style="font-size: 22px; background: none; -webkit-text-fill-color: var(--text-primary); color: var(--text-primary);">0s</div>
+          <div class="stat-label" style="font-size: 11px;">Time Taken</div>
+        </div>
+      </div>
+
+      <div class="flex justify-center gap-3 mt-6" id="action-buttons">
+        <button class="btn btn-primary" onclick="playAgain()">Take Quiz Again 🔄</button>
+        <a href="dashboard.html" class="btn btn-secondary">Go to Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Review Section -->
+    <div class="section mt-8 slide-up" style="animation-delay: 0.15s">
+      <h2 class="section-title mb-4">Detailed Question Review</h2>
+      <div class="review-list" id="review-list">
+        <!-- Populated by script -->
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const session = guardPage();
+      if (!session) return;
+
+      document.getElementById('nav-avatar').textContent = session.username[0].toUpperCase();
+      document.getElementById('nav-username').textContent = session.username;
+
+      const attempt = JSON.parse(localStorage.getItem('lastAttempt'));
+      if (!attempt) {
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      const pct = Math.round((attempt.score / attempt.total) * 100);
+
+      // Set text content
+      document.getElementById('res-subject').textContent = attempt.subject;
+      document.getElementById('res-level').textContent = attempt.level;
+      document.getElementById('res-pct').textContent = pct + '%';
+      document.getElementById('res-score-fraction').textContent = `${attempt.score}/${attempt.total}`;
+      document.getElementById('stat-time').textContent = _formatTime(attempt.timeTaken);
+
+      // Count stats
+      let correctCount = 0;
+      let wrongCount = 0;
+      let skippedCount = 0;
+
+      attempt.review.forEach(item => {
+        if (item.userAnswer === null) skippedCount++;
+        else if (item.correct) correctCount++;
+        else wrongCount++;
+      });
+
+      document.getElementById('stat-correct').textContent = correctCount;
+      document.getElementById('stat-wrong').textContent = wrongCount;
+      document.getElementById('stat-skipped').textContent = skippedCount;
+
+      // Performance styling
+      const ringFill = document.getElementById('score-ring-fill');
+      const perfBadge = document.getElementById('res-performance-badge');
+      const msgEl = document.getElementById('res-message');
+
+      ringFill.className.baseVal = 'score-ring-fill';
+      perfBadge.className = 'result-badge';
+
+      if (pct >= 85) {
+        ringFill.classList.add('excellent');
+        perfBadge.classList.add('excellent');
+        perfBadge.textContent = '🏆 Excellent Mastery';
+        msgEl.textContent = 'Outstanding! You have mastered this difficulty levels for this topic.';
+      } else if (pct >= 70) {
+        ringFill.classList.add('good');
+        perfBadge.classList.add('good');
+        perfBadge.textContent = '🌟 Good Job';
+        msgEl.textContent = 'Great work! You have a solid grasp of this subject\'s core concepts.';
+      } else if (pct >= 50) {
+        ringFill.classList.add('average');
+        perfBadge.classList.add('average');
+        perfBadge.textContent = '👍 Passed';
+        msgEl.textContent = 'You passed! Re-read the explanations to fill in the gaps in your knowledge.';
+        msgEl.textContent = 'You passed! Re-read the explanations to fill in the gaps in your knowledge.';
+      } else {
+        ringFill.classList.add('poor');
+        perfBadge.classList.add('poor');
+        perfBadge.textContent = '💪 Keep Practicing';
+        msgEl.textContent = 'Don\'t give up! Try again and review the explanations below to learn more.';
+      }
+
+      // Add Download Certificate button if >= 80%
+      if (pct >= 80) {
+        const actionButtons = document.getElementById('action-buttons');
+        const certBtn = document.createElement('button');
+        certBtn.className = 'btn btn-primary';
+        certBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        certBtn.innerHTML = '🎓 Download Certificate';
+        certBtn.onclick = () => downloadCertificate(attempt.subject, attempt.level, pct, session.username);
+        actionButtons.insertBefore(certBtn, actionButtons.firstChild);
+      }
+
+      // Circular animation delay trigger
+      setTimeout(() => {
+        const radius = 80;
+        const circumference = 2 * Math.PI * radius; // ~502.65
+        const offset = circumference - (pct / 100) * circumference;
+        ringFill.style.strokeDashoffset = offset;
+      }, 100);
+
+      // Render detailed review list
+      const reviewContainer = document.getElementById('review-list');
+      reviewContainer.innerHTML = attempt.review.map((item, idx) => {
+        let typeClass = 'skipped';
+        let badgeText = '🟡 SKIPPED';
+        if (item.userAnswer !== null) {
+          if (item.correct) {
+            typeClass = 'correct';
+            badgeText = '🟢 CORRECT';
+          } else {
+            typeClass = 'wrong';
+            badgeText = '🔴 INCORRECT';
+          }
+        }
+
+        const safeUserAnswer = item.userAnswer !== null ? item.userAnswer.replace(/</g, '&lt;').replace(/>/g, '&gt;') : null;
+        const safeCorrectAnswer = item.answer.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const safeQ = item.q.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const safeExplanation = item.explanation ? item.explanation.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+
+        const yourAnswerMarkup = item.userAnswer !== null
+          ? `<div class="review-your-answer ${item.correct ? 'correct' : ''}"><strong>Your Answer:</strong> ${safeUserAnswer}</div>`
+          : `<div class="review-your-answer" style="color: var(--text-muted);"><strong>Your Answer:</strong> <em>Not Answered</em></div>`;
+
+        return `
+          <div class="review-item ${typeClass}">
+            <div class="flex justify-between align-center mb-2" style="align-items: center; justify-content: space-between;">
+              <span style="font-size: 11px; font-weight:700; color: var(--text-muted);">QUESTION ${idx + 1}</span>
+              <span class="badge" style="font-size: 10px; padding: 2px 8px;">${badgeText}</span>
+            </div>
+            <p class="review-q">${safeQ}</p>
+            <div class="review-answers">
+              ${yourAnswerMarkup}
+              ${!item.correct ? `<div class="review-correct-answer"><strong>Correct Answer:</strong> ${safeCorrectAnswer}</div>` : ''}
+              ${item.explanation ? `<div class="review-explanation">${safeExplanation}</div>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    });
+
+    function playAgain() {
+      // Keep quizSubject and quizLevel in localStorage, and redirect to quiz
+      window.location.href = 'quiz.html';
+    }
+
+    function _formatTime(seconds) {
+      if (!seconds && seconds !== 0) return '0s';
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return m > 0 ? `${m}m ${s}s` : `${s}s`;
+    }
+
+    function downloadCertificate(subject, level, score, username) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Border
+      doc.setDrawColor(124, 58, 237);
+      doc.setLineWidth(2);
+      doc.rect(10, 10, 277, 190);
+      doc.rect(12, 12, 273, 186);
+
+      // Header
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(40);
+      doc.setFont("helvetica", "bold");
+      doc.text("CERTIFICATE OF COMPLETION", 148, 50, null, null, "center");
+
+      // Subheader
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "normal");
+      doc.text("This is to certify that", 148, 70, null, null, "center");
+
+      // Name
+      doc.setFontSize(32);
+      doc.setTextColor(37, 99, 235);
+      doc.setFont("helvetica", "bolditalic");
+      doc.text(username, 148, 90, null, null, "center");
+
+      // Description
+      doc.setFontSize(16);
+      doc.setTextColor(30, 30, 30);
+      doc.setFont("helvetica", "normal");
+      doc.text(`has successfully completed the ${level} level quiz on`, 148, 110, null, null, "center");
+
+      // Subject
+      doc.setFontSize(26);
+      doc.setTextColor(124, 58, 237);
+      doc.setFont("helvetica", "bold");
+      doc.text(subject, 148, 130, null, null, "center");
+
+      // Score
+      doc.setFontSize(16);
+      doc.setTextColor(30, 30, 30);
+      doc.setFont("helvetica", "normal");
+      doc.text(`with a score of ${score}%`, 148, 145, null, null, "center");
+
+      // Date and Signature
+      const date = new Date().toLocaleDateString();
+      doc.setFontSize(12);
+      doc.text(`Date: ${date}`, 60, 175);
+      
+      doc.text("QuizMaster Admin", 230, 175, null, null, "center");
+      doc.line(200, 170, 260, 170);
+
+      // Footer
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text("Generated by QuizMaster Platform", 148, 195, null, null, "center");
+
+      doc.save(`QuizMaster_Certificate_${subject}_${username}.pdf`);
+    }
+  </script>
+</body>
+</html>

@@ -3,104 +3,284 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign Up</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <title>QuizMaster — Create Account</title>
+  <meta name="description" content="Create your free QuizMaster account and start testing your knowledge across 6 subjects today." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #ffecd2, #fcb69f);
-      height: 100vh;
+    .auth-split {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    /* ---- Left Hero Panel ---- */
+    .auth-hero {
+      background: linear-gradient(135deg, #0d0d1a 0%, #0a1a2e 50%, #0d1a0a 100%);
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
+      padding: 60px;
+      position: relative;
+      overflow: hidden;
     }
-    .form-wrapper {
+    .auth-hero::before {
+      content: '';
+      position: absolute;
+      top: -100px; left: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%);
+      animation: heroGlow 6s ease-in-out infinite alternate;
+    }
+    .auth-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; right: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 70%);
+      animation: heroGlow 8s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes heroGlow {
+      from { transform: scale(1); opacity: 0.7; }
+      to   { transform: scale(1.2); opacity: 1; }
+    }
+    .hero-brand {
       display: flex;
-      justify-content: center;
       align-items: center;
-      width: 100%;
+      gap: 14px;
+      margin-bottom: 60px;
+      position: relative;
+      z-index: 1;
     }
-    .form-card {
-      background: #fff;
-      padding: 40px 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
+    .hero-brand-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, #10b981, #2563eb);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 8px 24px rgba(16,185,129,0.4);
     }
-    .icon { font-size: 3rem; margin-bottom: 10px; }
-    h2 { font-size: 24px; margin-bottom: 10px; color: #333; }
-    p { font-size: 14px; color: #666; margin-bottom: 25px; }
-    form input {
-      width: 100%;
-      padding: 12px 15px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      font-size: 14px;
+    .hero-brand-name {
+      font-size: 22px; font-weight: 800;
+      background: linear-gradient(135deg, #6ee7b7, #60a5fa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    form input:focus {
-      border-color: #fb9475;
-      outline: none;
-      box-shadow: 0 0 5px rgba(251, 148, 117, 0.5);
+    .hero-headline {
+      position: relative; z-index: 1;
+      font-size: 44px; font-weight: 800;
+      line-height: 1.15;
+      color: #f1f5f9;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
     }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #fb9475;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s;
+    .hero-headline span {
+      background: linear-gradient(135deg, #6ee7b7, #60a5fa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    button:hover { background-color: #f67c5f; }
-    .link-msg {
-      margin-top: 20px;
-      font-size: 14px;
+    .hero-sub {
+      position: relative; z-index: 1;
+      font-size: 16px; color: #94a3b8;
+      line-height: 1.7;
+      max-width: 380px;
+      margin-bottom: 48px;
     }
-    .link-msg a {
-      color: #fb9475;
-      text-decoration: none;
-      font-weight: 500;
+    .steps-list {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; gap: 0;
     }
-    .link-msg a:hover { text-decoration: underline; }
+    .step-item {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding-bottom: 24px;
+      position: relative;
+    }
+    .step-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 18px; top: 40px;
+      width: 2px; height: calc(100% - 16px);
+      background: linear-gradient(to bottom, rgba(16,185,129,0.4), transparent);
+    }
+    .step-num {
+      width: 36px; height: 36px; flex-shrink: 0;
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.4);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #6ee7b7;
+    }
+    .step-text strong { color: #f1f5f9; font-size: 14px; display: block; margin-bottom: 3px; }
+    .step-text span { font-size: 13px; color: #94a3b8; }
+
+    /* ---- Right Form Panel ---- */
+    .auth-form-panel {
+      background: #0d0d1a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 80px;
+    }
+    .auth-form-inner { width: 100%; max-width: 400px; }
+    .auth-form-title {
+      font-size: 28px; font-weight: 800;
+      color: #f1f5f9; letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+    .auth-form-sub { font-size: 14px; color: #94a3b8; margin-bottom: 32px; }
+
+    @media (max-width: 900px) {
+      .auth-split { grid-template-columns: 1fr; }
+      .auth-hero { display: none; }
+      .auth-form-panel { padding: 40px 24px; }
+    }
   </style>
 </head>
 <body>
-  <div class="form-wrapper">
-    <div class="form-card">
-      <div class="icon">📝</div>
-      <h2>Create Account</h2>
-      <p>Fill the details below to sign up</p>
-      <form id="signupForm">
-        <input type="text" id="username" placeholder="Username" required />
-        <input type="email" id="email" placeholder="Email" required />
-        <input type="password" id="password" placeholder="Password" required />
-        <button type="submit">Sign Up</button>
-      </form>
-      <div class="link-msg">
-        Already have an account? <a href="index.html">Login</a>
+  <div class="auth-split">
+
+    <!-- Left: Hero Panel -->
+    <div class="auth-hero">
+      <div class="hero-brand">
+        <div class="hero-brand-icon">✨</div>
+        <span class="hero-brand-name">QuizMaster</span>
+      </div>
+
+      <h1 class="hero-headline">
+        Start Your<br><span>Learning</span><br>Journey Today
+      </h1>
+      <p class="hero-sub">
+        Join thousands of learners. Create your free account in seconds and get instant access to 180+ questions across 6 technical subjects.
+      </p>
+
+      <div class="steps-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            <strong>Create your account</strong>
+            <span>Pick a username and set your password</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            <strong>Choose a subject & difficulty</strong>
+            <span>Easy, Medium or Hard — you decide</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            <strong>Take the quiz & earn rewards</strong>
+            <span>Score 80%+ to unlock your certificate!</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Right: Form Panel -->
+    <div class="auth-form-panel">
+      <div class="auth-form-inner">
+        <h2 class="auth-form-title">Create your account ✨</h2>
+        <p class="auth-form-sub">It's free and takes less than a minute</p>
+
+        <div id="signup-alert" class="alert alert-error" role="alert">
+          <span>⚠️</span>
+          <span id="signup-alert-msg">Error message</span>
+        </div>
+
+        <form id="signup-form" novalidate>
+          <div class="form-group">
+            <label for="signup-username" class="form-label">Username</label>
+            <input
+              type="text"
+              id="signup-username"
+              class="form-input"
+              placeholder="Choose a username (min. 3 chars)"
+              autocomplete="username"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="signup-email" class="form-label">Email Address</label>
+            <input
+              type="email"
+              id="signup-email"
+              class="form-input"
+              placeholder="your@email.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="signup-password" class="form-label">Password</label>
+            <input
+              type="password"
+              id="signup-password"
+              class="form-input"
+              placeholder="At least 6 characters"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="signup-confirm" class="form-label">Confirm Password</label>
+            <input
+              type="password"
+              id="signup-confirm"
+              class="form-input"
+              placeholder="Repeat your password"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full btn-lg" id="signup-btn" style="margin-top: 8px; background: linear-gradient(135deg, #10b981, #2563eb);">
+            Create Account 🚀
+          </button>
+        </form>
+
+        <div class="auth-link" style="margin-top: 28px;">
+          Already have an account? <a href="index.html">Sign in →</a>
+        </div>
+      </div>
+    </div>
+
   </div>
 
+  <script src="js/auth.js"></script>
   <script>
-    document.getElementById("signupForm").addEventListener("submit", function(e) {
+    if (getSession()) window.location.href = 'dashboard.html';
+
+    document.getElementById('signup-form').addEventListener('submit', function (e) {
       e.preventDefault();
-      const username = document.getElementById("username").value;
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+      const username = document.getElementById('signup-username').value.trim();
+      const email    = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const confirm  = document.getElementById('signup-confirm').value;
+      const alertEl  = document.getElementById('signup-alert');
+      const alertMsg = document.getElementById('signup-alert-msg');
 
-      // Store in localStorage
-      localStorage.setItem("user", JSON.stringify({ username, email, password }));
+      alertEl.classList.remove('visible');
 
-      alert("Signup successful! Redirecting to login...");
-      window.location.href = "index.html";
+      if (password !== confirm) {
+        alertMsg.textContent = 'Passwords do not match. Please try again.';
+        alertEl.classList.add('visible');
+        return;
+      }
+
+      const result = signup(username, email, password);
+      if (result.success) {
+        login(username, password);
+        window.location.href = 'dashboard.html';
+      } else {
+        alertMsg.textContent = result.message;
+        alertEl.classList.add('visible');
+      }
     });
   </script>
 </body>

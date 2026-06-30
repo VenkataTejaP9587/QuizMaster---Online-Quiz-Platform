@@ -1,19 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Select Subject</title>
-  <link rel="stylesheet" href="subjects.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizMaster — Select Subject</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <h2>Select Subject</h2>
-  <div class="subjects">
-    <button onclick="selectSubject('Python')">🐍 Python</button>
-    <button onclick="selectSubject('AI')">🧠 AI</button>
-    <button onclick="selectSubject('Web')">🌐 Web Development</button>
-  </div>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="dashboard.html" class="navbar-brand">
+        <div class="navbar-logo">🎯</div>
+        <span class="navbar-title">QuizMaster</span>
+      </a>
+      <div class="navbar-right">
+        <div class="navbar-user">
+          <div class="avatar" id="nav-avatar">U</div>
+          <span id="nav-username">Username</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-6">
+    <div class="page-header slide-up">
+      <a href="dashboard.html" class="btn btn-ghost btn-sm mb-4">← Back to Dashboard</a>
+      <h1 class="page-title">Choose a Subject</h1>
+      <p class="page-subtitle">Select the topic you want to be tested on. Each quiz consists of 10 questions.</p>
+    </div>
+
+    <div class="subjects-grid slide-up" style="animation-delay: 0.15s">
+      <!-- Python Card -->
+      <button class="subject-card python" onclick="selectSubject('Python')">
+        <span class="subject-icon">🐍</span>
+        <span class="subject-name">Python Programming</span>
+        <p class="subject-desc">Test your understanding of Python syntax, data types, functions, OOP, and advanced concepts.</p>
+        <div class="subject-meta">
+          <span class="badge badge-blue">Syntax & OOP</span>
+          <span class="badge badge-purple">10 Questions</span>
+        </div>
+      </button>
+
+      <!-- AI Card -->
+      <button class="subject-card ai" onclick="selectSubject('AI')">
+        <span class="subject-icon">🧠</span>
+        <span class="subject-name">Artificial Intelligence</span>
+        <p class="subject-desc">Dive into AI history, ML models, neural networks, deep learning, NLP, and reinforcement learning.</p>
+        <div class="subject-meta">
+          <span class="badge badge-purple">AI / ML / DL</span>
+          <span class="badge badge-purple">10 Questions</span>
+        </div>
+      </button>
+
+      <!-- Web Dev Card -->
+      <button class="subject-card webdev" onclick="selectSubject('Web Dev')">
+        <span class="subject-icon">🌐</span>
+        <span class="subject-name">Web Development</span>
+        <p class="subject-desc">Test your skills in frontend stack, CSS layouts, JS ES6+, REST APIs, security (CORS/CSP), and react architecture.</p>
+        <div class="subject-meta">
+          <span class="badge badge-cyan">HTML/CSS/JS</span>
+          <span class="badge badge-purple">10 Questions</span>
+        </div>
+      </button>
+
+      <!-- DSA Card -->
+      <button class="subject-card dsa" onclick="selectSubject('DSA')">
+        <span class="subject-icon">📊</span>
+        <span class="subject-name">Data Structures & Algos</span>
+        <p class="subject-desc">Challenge yourself with arrays, trees, dynamic programming, sorting/searching algorithms, and graph theory.</p>
+        <div class="subject-meta">
+          <span class="badge badge-green">Trees / Graphs / DP</span>
+          <span class="badge badge-purple">10 Questions</span>
+        </div>
+      </button>
+
+      <!-- DBMS Card -->
+      <button class="subject-card dbms" onclick="selectSubject('DBMS')">
+        <span class="subject-icon">🗄️</span>
+        <span class="subject-name">Database Systems</span>
+        <p class="subject-desc">Evaluate your knowledge of SQL queries, schema design, database normalization, ACID properties, and indexing.</p>
+        <div class="subject-meta">
+          <span class="badge badge-yellow">SQL & Normalization</span>
+          <span class="badge badge-purple">10 Questions</span>
+        </div>
+      </button>
+
+      <!-- Networks Card -->
+      <button class="subject-card networks" onclick="selectSubject('Networks')">
+        <span class="subject-icon">🔌</span>
+        <span class="subject-name">Computer Networks</span>
+        <p class="subject-desc">Test your knowledge on the OSI model, IP routing, subnetting, TCP/IP protocols, NAT, DNS, and secure tunnels.</p>
+        <div class="subject-meta">
+          <span class="badge badge-red">OSI / TCP / Routing</span>
+          <span class="badge badge-purple">10 Questions</span>
+        </div>
+      </button>
+    </div>
+  </main>
+
+  <script src="js/auth.js"></script>
   <script>
-    function selectSubject(sub) {
-      localStorage.setItem('subject', sub);
+    const session = guardPage();
+    if (session) {
+      document.getElementById('nav-avatar').textContent = session.username[0].toUpperCase();
+      document.getElementById('nav-username').textContent = session.username;
+    }
+
+    function selectSubject(subject) {
+      localStorage.setItem('quizSubject', subject);
       window.location.href = 'levels.html';
     }
   </script>
